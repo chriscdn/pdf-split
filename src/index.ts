@@ -1,0 +1,99 @@
+import { promisify } from "util";
+import { exec as _exec } from "child_process";
+import path from "path";
+import fs from "fs/promises";
+import { rimraf } from "rimraf";
+import { FileCache, FileCacheOptions, FilePath } from "@chriscdn/file-cache";
+import temp from "temp";
+import { Semaphore } from "@chriscdn/promise-semaphore";
+import { pathExists } from "path-exists";
+
+const semaphore = new Semaphore();
+const execPromise = promisify(_exec);
+
+type PDFArgs = {
+    pdfFilePath: FilePath;
+    pageIndex: number; // 0-based
+};
+
+export type PDFSplitFileCacheOptions =
+    & Omit<
+        FileCacheOptions<PDFArgs>,
+        "cb" | "ext"
+    >
+    & {
+        pdfcpu?: FilePath;
+    };
+
+class PDFSplitFileCache extends FileCache<PDFArgs> {
+    constructor(args: PDFSplitFileCacheOptions) {
+        super({
+            ...args,
+            ext: () => ".pdf",
+            cb: async (filePath, { pdfFilePath, pageIndex }) => {
+                try {
+                    await semaphore.acquire(pdfFilePath);
+
+                    if (await pathExists(filePath)) {
+                        // all done
+                    } else {
+                        const _thumbnailPath = await temp.mkdir(
+                            "pdf-thumbnails",
+                        );
+
+                        const command = [
+                            args.pdfcpu ?? "pdfcpu",
+                            "split",
+                            pdfFilePath,
+                            _thumbnailPath,
+                        ];
+
+                        console.time("s");
+                        await execPromise(command.join(" "));
+                        console.timeEnd("s");
+                        const pdfFiles = await fs.readdir(_thumbnailPath);
+
+                        await Promise.all(pdfFiles.map(async (pdfFile) => {
+                            const match = pdfFile.match(/_(\d+)\.pdf$/);
+
+                            if (match) {
+                                const _pageIndex = parseInt(match[1], 10) - 1;
+
+                                const sourceFilePath = path.join(
+                                    _thumbnailPath,
+                                    pdfFile,
+                                );
+
+                                const targetFilePath = await this
+                                    .resolveFilePath({
+                                        pdfFilePath,
+                                        pageIndex: _pageIndex,
+                                    });
+
+                                await fs.mkdir(path.dirname(targetFilePath), {
+                                    recursive: true,
+                                });
+
+                                // This assumes the same volume. TBD.
+                                await fs.rename(sourceFilePath, targetFilePath);
+                            }
+                        }));
+
+                        // After all that, check if we have a file.
+                        if (await pathExists(filePath)) {
+                            // all good
+                        } else {
+                            throw new Error(
+                                `Invalid range or PDF: ${pageIndex}`,
+                            );
+                        }
+                    }
+                } finally {
+                    semaphore.release(pdfFilePath);
+                }
+            },
+        });
+    }
+}
+
+export { PDFSplitFileCache };
