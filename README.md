@@ -30,7 +30,7 @@ const splitCache = new PDFSplitFileCache({
 });
 ```
 
-The `PDFSplitFileCache` class extends `FileCache` from [@chriscdn/file-cache](https://github.com/chriscdn/file-cache). All constructor arguments from `FileCache` are supported except for `cb` and `ext`. The caching, including automatic cleanup of expired files, is fully managed by `FileCache`.
+The `PDFSplitFileCache` class extends `FileCache` from [@chriscdn/file-cache](https://github.com/chriscdn/file-cache). All constructor arguments from `FileCache` are supported except for `cb` and `ext`. The caching, including automatic cleanup of expired files, is managed by `FileCache`.
 
 Retrieve the file path to a PDF page:
 
