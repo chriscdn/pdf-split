@@ -1,6 +1,6 @@
 # pdf-split
 
-`pdf-split` is a package that splits a PDF into individual pages and caches the results on the file system. It relies on [pdfcpu](https://pdfcpu.io/) for the split operation, and [@chriscdn/file-cache](https://github.com/chriscdn/file-cache) for file caching.
+`pdf-split` is a package that splits a PDF into individual pages and caches the results on the file system. It relies on [pdfcpu](https://pdfcpu.io/) for the split operation and [@chriscdn/file-cache](https://github.com/chriscdn/file-cache) for automatic file caching, including cleanup.
 
 ## Installation
 
@@ -30,7 +30,7 @@ const splitCache = new PDFSplitFileCache({
 });
 ```
 
-The `PDFSplitFileCache` class extends `FileCache` from [@chriscdn/file-cache](https://github.com/chriscdn/file-cache). All constructor arguments from `FileCache` are supported with the exception of `cb` and `ext`.
+The `PDFSplitFileCache` class extends `FileCache` from [@chriscdn/file-cache](https://github.com/chriscdn/file-cache). All constructor arguments from `FileCache` are supported except for `cb` and `ext`. The caching, including automatic cleanup of expired files, is fully managed by `FileCache`.
 
 Retrieve the file path to a PDF page:
 
@@ -45,6 +45,7 @@ const filePath = await splitCache.getFile({
 
 - `pageIndex` is 0-based.
 - The cache key is based on `pdfFilePath` and `pageIndex`. Ensure that unique PDFs have unique names to avoid cache collisions.
+- File caching and cleanup are handled automatically by `FileCache`.
 
 ## License
 
