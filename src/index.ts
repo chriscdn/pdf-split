@@ -10,6 +10,21 @@ import { pathExists } from "path-exists";
 const semaphore = new Semaphore();
 const execPromise = promisify(_exec);
 
+const moveFile = async (src: FilePath, dest: FilePath) => {
+    try {
+        // Try a normal rename first
+        await fs.rename(src, dest);
+    } catch (err) {
+        if (err.code === "EXDEV") {
+            // Cross-device fallback: copy + delete
+            await fs.copyFile(src, dest);
+            await fs.unlink(src);
+        } else {
+            throw err; // some other error
+        }
+    }
+};
+
 type PDFArgs = {
     pdfFilePath: FilePath;
     pageIndex: number; // 0-based
@@ -72,8 +87,7 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                                     recursive: true,
                                 });
 
-                                // This assumes the same volume. TBD.
-                                await fs.rename(sourceFilePath, targetFilePath);
+                                await moveFile(sourceFilePath, targetFilePath);
                             }
                         }));
 
