@@ -48,9 +48,8 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                             _thumbnailPath,
                         ];
 
-                        console.time("s");
                         await execPromise(command.join(" "));
-                        console.timeEnd("s");
+
                         const pdfFiles = await fs.readdir(_thumbnailPath);
 
                         await Promise.all(pdfFiles.map(async (pdfFile) => {
