@@ -2,7 +2,6 @@ import { promisify } from "util";
 import { exec as _exec } from "child_process";
 import path from "path";
 import fs from "fs/promises";
-import { rimraf } from "rimraf";
 import { FileCache, FileCacheOptions, FilePath } from "@chriscdn/file-cache";
 import temp from "temp";
 import { Semaphore } from "@chriscdn/promise-semaphore";

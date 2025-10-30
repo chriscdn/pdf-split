@@ -1,11 +1,3 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "outDir": "./lib",
-    "declaration": true,
-    "declarationDir": "./lib",
-    "sourceMap": true
-  },
-  "include": ["./src/**/*"]
+  "compilerOptions": { "allowSyntheticDefaultImports": true }
 }

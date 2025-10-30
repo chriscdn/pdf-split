@@ -1,34 +1,36 @@
 {
   "name": "@chriscdn/pdf-split",
   "version": "0.0.1",
-  "description": "PDF Splitter with caching",
+  "description": "Split a PDF into individual pages with caching",
   "repository": "https://github.com/chriscdn/pdf-split",
   "author": "Christopher Meyer <chris@schwiiz.org>",
   "license": "MIT",
   "type": "module",
   "source": "./src/index.ts",
-  "module": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "./lib/pdf-split.cjs",
+  "module": "./lib/pdf-split.module.js",
   "exports": {
-    "default": "./lib/index.js"
+    "types": "./lib/index.d.ts",
+    "require": "./lib/pdf-split.cjs",
+    "default": "./lib/pdf-split.modern.js"
   },
+  "types": "./lib/index.d.ts",
   "scripts": {
-    "build": "rimraf ./lib/ && tsc",
+    "build": "rm -rf ./lib/ && microbundle --target node --format modern,esm,cjs",
+    "dev": "microbundle watch",
     "test": "vitest"
   },
-  "devDependencies": {
-    "@tsconfig/node22": "^22.0.2",
-    "@types/node": "^24.9.2",
-    "@types/temp": "^0.9.4",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.5"
-  },
   "dependencies": {
-    "@chriscdn/file-cache": "^0.0.13",
-    "@chriscdn/promise-semaphore": "^3.1.1",
+    "@chriscdn/file-cache": "^0.0.14",
+    "@chriscdn/pdf-thumbnails": "^0.0.5",
     "path-exists": "^5.0.0",
     "temp": "^0.9.4"
+  },
+  "devDependencies": {
+    "@types/temp": "^0.9.4",
+    "microbundle": "^0.15.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.5"
   },
   "files": [
     "lib"
