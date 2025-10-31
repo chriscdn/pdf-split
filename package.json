@@ -1,6 +1,6 @@
 {
   "name": "@chriscdn/pdf-split",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Split a PDF into individual pages with caching.",
   "repository": "https://github.com/chriscdn/pdf-split",
   "author": "Christopher Meyer <chris@schwiiz.org>",
