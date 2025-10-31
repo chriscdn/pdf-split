@@ -64,7 +64,7 @@ Fetch the page count:
 const pageCount = await splitCache.pageCount("/path/to/your/pdf/file.pdf");
 ```
 
-Fetch an array with the full path to each individual pdf. This length of the array should match `pageCount`:
+Fetch an array with the full path to each page of the split pdf. This length of the array should match `pageCount`:
 
 ```ts
 const pages = await splitCache.pages("/path/to/your/pdf/file.pdf");
