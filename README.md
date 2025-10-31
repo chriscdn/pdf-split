@@ -1,6 +1,6 @@
 # pdf-split
 
-`pdf-split` is a package that splits a PDF into individual pages and caches the results on the file system. It relies on [pdfcpu](https://pdfcpu.io/) for the split operation and [@chriscdn/file-cache](https://github.com/chriscdn/file-cache) for automatic file caching, including cleanup.
+`pdf-split` is a package that splits a PDF into individual pages and caches the results on the file system. It relies on [pdfcpu](https://pdfcpu.io/) for the split operation and [@chriscdn/file-cache](https://github.com/chriscdn/file-cache) for file caching and cleanup.
 
 ## Installation
 
