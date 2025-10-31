@@ -23,11 +23,9 @@
   "dependencies": {
     "@chriscdn/file-cache": "^0.0.14",
     "@chriscdn/pdf-thumbnails": "^0.0.5",
-    "path-exists": "^5.0.0",
-    "temp": "^0.9.4"
+    "path-exists": "^5.0.0"
   },
   "devDependencies": {
-    "@types/temp": "^0.9.4",
     "microbundle": "^0.15.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.5"

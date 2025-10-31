@@ -3,27 +3,11 @@ import { exec as _exec } from "child_process";
 import path from "path";
 import fs from "fs/promises";
 import { FileCache, FileCacheOptions, FilePath } from "@chriscdn/file-cache";
-import temp from "temp";
 import { Semaphore } from "@chriscdn/promise-semaphore";
 import { pathExists } from "path-exists";
 
 const semaphore = new Semaphore();
 const execPromise = promisify(_exec);
-
-const moveFile = async (src: FilePath, dest: FilePath) => {
-    try {
-        // Try a normal rename first
-        await fs.rename(src, dest);
-    } catch (err) {
-        if (err.code === "EXDEV") {
-            // Cross-device fallback: copy + delete
-            await fs.copyFile(src, dest);
-            await fs.unlink(src);
-        } else {
-            throw err; // some other error
-        }
-    }
-};
 
 type PDFArgs = {
     pdfFilePath: FilePath;
@@ -46,14 +30,27 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
             ext: () => ".pdf",
             cb: async (filePath, { pdfFilePath, pageIndex }) => {
                 try {
+                    // The semaphore prevents multiple consecutive calls (with
+                    // different page numbers) from running the full extraction
+                    // again.
                     await semaphore.acquire(pdfFilePath);
 
                     if (await pathExists(filePath)) {
                         // all done
                     } else {
-                        const _thumbnailPath = await temp.mkdir(
-                            "pdf-thumbnails",
+                        // We create a _temp directory in the cache directory to hold the temp files.
+                        // Why? This guarantees the temp files are stored on the same volume, which
+                        // removes problems renaming the files later.
+                        //
+                        // Orphaned files are also cleaned up by the FileCache cleanup.
+                        const _thumbnailPath = path.resolve(
+                            args.cachePath,
+                            "_temp",
                         );
+
+                        await fs.mkdir(_thumbnailPath);
+
+                        // console.log(_thumbnailPath);
 
                         const command = [
                             args.pdfcpu ?? "pdfcpu",
@@ -62,7 +59,9 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                             _thumbnailPath,
                         ];
 
+                        console.time("pdfcpu - split");
                         await execPromise(command.join(" "));
+                        console.timeEnd("pdfcpu - split");
 
                         const pdfFiles = await fs.readdir(_thumbnailPath);
 
@@ -87,7 +86,8 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                                     recursive: true,
                                 });
 
-                                await moveFile(sourceFilePath, targetFilePath);
+                                // these should always be on the same volume, making an fs.rename possible
+                                await fs.rename(sourceFilePath, targetFilePath);
                             }
                         }));
 
