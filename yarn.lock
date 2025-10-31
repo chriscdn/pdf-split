@@ -885,19 +885,6 @@
   resolved "https://registry.yarnpkg.com/@chriscdn/duration/-/duration-1.0.3.tgz#2b936422c729cb344bab218363b74eabfa5120d1"
   integrity sha512-t/EGNi53eOSUUgm9yPb9X+aj1pPo8rkhQBHSm0qWAnGL/UbTRbZTnmqpXAb28x16MpBbOTnecyVQDP7e+uYpVQ==
 
-"@chriscdn/file-cache@^0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@chriscdn/file-cache/-/file-cache-0.0.13.tgz#af3b0aaa62a3a216a85fbfc0021800042843f482"
-  integrity sha512-kaTz7EuI6rbbNdDD++C00nrrwyjcNfqEENnk1O6QD4vspTGoaaCSFHOvt3RHhQOUHghunmpLpeujHAkLJsEMIA==
-  dependencies:
-    "@chriscdn/duration" "^1.0.3"
-    "@chriscdn/find-nuke" "^0.0.5"
-    "@chriscdn/promise-semaphore" "^3.1.1"
-    path-exists "^5.0.0"
-    sha1 "^1.1.1"
-    temp "^0.9.4"
-    touch "^3.1.1"
-
 "@chriscdn/file-cache@^0.0.14":
   version "0.0.14"
   resolved "https://registry.yarnpkg.com/@chriscdn/file-cache/-/file-cache-0.0.14.tgz#b0f4acd5d45e6e56e945b4624be789751b6a759b"
@@ -919,12 +906,12 @@
     "@chriscdn/duration" "^1.0.3"
     rimraf "5"
 
-"@chriscdn/pdf-thumbnails@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@chriscdn/pdf-thumbnails/-/pdf-thumbnails-0.0.5.tgz#6c06a347b924e821c2aeeb1ef3889bc97002419c"
-  integrity sha512-fsQ0+eOBDVm+602DKNLG70mF8mGeJeZqn6/u28OdfrJuzearR4VTM1P54AA18c9ligfyoBJoGrAv++k4r4sCAw==
+"@chriscdn/pdf-thumbnails@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@chriscdn/pdf-thumbnails/-/pdf-thumbnails-0.0.6.tgz#cab934e3e01a9cc046b3846693636ec748779a31"
+  integrity sha512-DPnUFHWsbuwx4iDY/iluv0mPcQflTUFjMAvKIwiJaEVQhD9G+O4n2Pefyb5F0zQf4AcksxGhkaVBJAd2Eq39RA==
   dependencies:
-    "@chriscdn/file-cache" "^0.0.13"
+    "@chriscdn/file-cache" "^0.0.14"
     pdf-lib "^1.17.1"
     rimraf "^6.0.1"
     temp "^0.9.4"

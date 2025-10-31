@@ -23,6 +23,9 @@ export type PDFSplitFileCacheOptions =
         pdfcpu?: FilePath;
     };
 
+const randomDirectoryName = (l = 16) =>
+    [...Array(l)].map(() => Math.random().toString(36)[2]).join("");
+
 class PDFSplitFileCache extends FileCache<PDFArgs> {
     constructor(args: PDFSplitFileCacheOptions) {
         super({
@@ -38,19 +41,20 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                     if (await pathExists(filePath)) {
                         // all done
                     } else {
-                        // We create a _temp directory in the cache directory to hold the temp files.
-                        // Why? This guarantees the temp files are stored on the same volume, which
-                        // removes problems renaming the files later.
+                        // Create a _temp directory in the cache directory to
+                        // hold the temp files. This guarantees the temp files
+                        // are stored on the same volume, which removes problems
+                        // moving the files later.
                         //
-                        // Orphaned files are also cleaned up by the FileCache cleanup.
+                        // Orphaned files and empty directories are cleaned up
+                        // by FileCache.
                         const _thumbnailPath = path.resolve(
                             args.cachePath,
                             "_temp",
+                            randomDirectoryName(),
                         );
 
-                        await fs.mkdir(_thumbnailPath);
-
-                        // console.log(_thumbnailPath);
+                        await fs.mkdir(_thumbnailPath, { recursive: true });
 
                         const command = [
                             args.pdfcpu ?? "pdfcpu",
@@ -69,6 +73,7 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                             const match = pdfFile.match(/_(\d+)\.pdf$/);
 
                             if (match) {
+                                // The -1 makes this 0-based
                                 const _pageIndex = parseInt(match[1], 10) - 1;
 
                                 const sourceFilePath = path.join(

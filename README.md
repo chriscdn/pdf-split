@@ -18,7 +18,7 @@ yarn add @chriscdn/pdf-split
 
 ## Usage
 
-Create a `PDFSplitFileCache` instance.
+Create a `PDFSplitFileCache` instance:
 
 ```ts
 import { PDFSplitFileCache } from "../src/index";
@@ -30,13 +30,23 @@ const splitCache = new PDFSplitFileCache({
 });
 ```
 
-The `PDFSplitFileCache` class extends `FileCache` from [@chriscdn/file-cache](https://github.com/chriscdn/file-cache). All constructor arguments from `FileCache` are supported except for `cb` and `ext`. The caching, including automatic cleanup of expired files, is managed by `FileCache`.
+This assumes that [pdfcpu](https://pdfcpu.io/) is available on the system `PATH`. If it is not, you can provide the path to the binary by using the `pdfcpu` parameter in the constructor:
+
+```ts
+const splitCache = new PDFSplitFileCache({
+  cachePath: "/path/to/cache/directory",
+  ttl: Duration.toMilliseconds({ days: 7 }),
+  pdfcpu: "/opt/homebrew/bin/pdfcpu",
+});
+```
+
+The `PDFSplitFileCache` class extends `FileCache` from [@chriscdn/file-cache](https://github.com/chriscdn/file-cache). All constructor arguments from `FileCache` are supported except for `cb` and `ext`. The cache, including automatic cleanup of expired files, is managed by `FileCache`.
 
 Retrieve the file path to a PDF page:
 
 ```ts
-const filePath = await splitCache.getFile({
-  pdfFilePath: "/path/to/your/file.pdf",
+const firstPageFilePath = await splitCache.getFile({
+  pdfFilePath: "/path/to/your/pdf/file.pdf",
   pageIndex: 0,
 });
 ```
@@ -45,7 +55,6 @@ const filePath = await splitCache.getFile({
 
 - `pageIndex` is 0-based.
 - The cache key is based on `pdfFilePath` and `pageIndex`. Ensure that unique PDFs have unique names to avoid cache collisions.
-- File caching and cleanup are handled automatically by `FileCache`.
 
 ## License
 
