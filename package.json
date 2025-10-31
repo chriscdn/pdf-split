@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@chriscdn/file-cache": "^0.0.14",
+    "@chriscdn/memoize": "^1.0.10",
     "path-exists": "^5.0.0"
   },
   "devDependencies": {

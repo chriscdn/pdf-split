@@ -906,7 +906,15 @@
     "@chriscdn/duration" "^1.0.3"
     rimraf "5"
 
-"@chriscdn/promise-semaphore@^3.1.1":
+"@chriscdn/memoize@^1.0.10":
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/@chriscdn/memoize/-/memoize-1.0.10.tgz#6620e9e711a5dbeee145b62237c4116b01636936"
+  integrity sha512-ODWvDyNARgVWCNBpD3KWeejqO1MoUVxWzuYZ3g1njIMt42tGxF6EtPAbefApgd/pTtVOXHMkWkH5TPY5UtVWFQ==
+  dependencies:
+    "@chriscdn/promise-semaphore" "^3.0.1"
+    quick-lru "^7.0.1"
+
+"@chriscdn/promise-semaphore@^3.0.1", "@chriscdn/promise-semaphore@^3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@chriscdn/promise-semaphore/-/promise-semaphore-3.1.1.tgz#cc9c273ae52eaf05bd615c89e262d1c3a3763c35"
   integrity sha512-ALLLLYlPfd/QZLptcVi6HQRK1zaCDWZoqYYw+axLmCatFs4gVTSZ5nqlyxwFe4qwR/K84HvOMa9hxda881FqMA==
@@ -3502,6 +3510,11 @@ promise.series@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/promise.series/-/promise.series-0.2.0.tgz#2cc7ebe959fc3a6619c04ab4dbdc9e452d864bbd"
   integrity sha512-VWQJyU2bcDTgZw8kpfBpB/ejZASlCrzwz5f2hjb/zlujOEB4oeiAhHygAWq8ubsX2GVkD4kCU5V2dwOTaCY5EQ==
+
+quick-lru@^7.0.1:
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-7.3.0.tgz#2af7e0fc72b66b7496251f6226cc723662c50665"
+  integrity sha512-k9lSsjl36EJdK7I06v7APZCbyGT2vMTsYSRX1Q2nbYmnkBqgUhRkAuzH08Ciotteu/PLJmIF2+tti7o3C/ts2g==
 
 randombytes@^2.1.0:
   version "2.1.0"

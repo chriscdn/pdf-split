@@ -5,6 +5,8 @@ import fs from "fs/promises";
 import { FileCache, FileCacheOptions, FilePath } from "@chriscdn/file-cache";
 import { Semaphore } from "@chriscdn/promise-semaphore";
 import { pathExists } from "path-exists";
+import { PDFCpuInfo } from "./types";
+import { Memoize } from "@chriscdn/memoize";
 
 const semaphore = new Semaphore();
 const execPromise = promisify(_exec);
@@ -26,7 +28,11 @@ export type PDFSplitFileCacheOptions =
 const randomDirectoryName = (l = 16) =>
     [...Array(l)].map(() => Math.random().toString(36)[2]).join("");
 
+const quote = (text: string) => `"${text}"`;
+
 class PDFSplitFileCache extends FileCache<PDFArgs> {
+    private pdfcpu: FilePath;
+
     constructor(args: PDFSplitFileCacheOptions) {
         super({
             ...args,
@@ -57,10 +63,10 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                         await fs.mkdir(_thumbnailPath, { recursive: true });
 
                         const command = [
-                            args.pdfcpu ?? "pdfcpu",
+                            this.pdfcpu,
                             "split",
-                            pdfFilePath,
-                            _thumbnailPath,
+                            quote(pdfFilePath),
+                            quote(_thumbnailPath),
                         ];
 
                         console.time("pdfcpu - split");
@@ -110,6 +116,39 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                 }
             },
         });
+
+        this.pdfcpu = args.pdfcpu ?? "pdfcpu";
+        this.pdfInfo = Memoize(this.pdfInfo.bind(this));
+    }
+
+    async pdfInfo(pdfFilePath: FilePath): Promise<PDFCpuInfo> {
+        const command = [
+            this.pdfcpu,
+            "info -json",
+            quote(pdfFilePath),
+        ];
+        const { stdout } = await execPromise(command.join(" "));
+        return JSON.parse(stdout) as PDFCpuInfo;
+    }
+
+    async pageCount(
+        pdfFilePath: FilePath,
+    ): Promise<PDFCpuInfo["infos"][number]["pageCount"]> {
+        const pdfInfo = await this.pdfInfo(pdfFilePath);
+        return pdfInfo.infos[0].pageCount;
+    }
+
+    async pages(
+        pdfFilePath: FilePath,
+    ): Promise<FilePath[]> {
+        const pageCount = await this.pageCount(pdfFilePath);
+
+        return await Promise.all(
+            Array.from(
+                { length: pageCount },
+                (_, i) => this.getFile({ pdfFilePath, pageIndex: i }),
+            ),
+        );
     }
 }
 

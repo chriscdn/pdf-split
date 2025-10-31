@@ -56,6 +56,20 @@ const firstPageFilePath = await splitCache.getFile({
 - `pageIndex` is 0-based.
 - The cache key is based on `pdfFilePath` and `pageIndex`. Ensure that unique PDFs have unique names to avoid cache collisions.
 
+## Other methods
+
+Fetch the page count:
+
+```ts
+const pageCount = await splitCache.pageCount("/path/to/your/pdf/file.pdf");
+```
+
+Fetch an array with the full path to each individual pdf. This length of the array should match `pageCount`:
+
+```ts
+const pages = await splitCache.pages("/path/to/your/pdf/file.pdf");
+```
+
 ## License
 
 [MIT](LICENSE)
