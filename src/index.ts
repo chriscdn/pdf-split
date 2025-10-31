@@ -78,7 +78,7 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                         await Promise.all(pdfFiles.map(async (pdfFile) => {
                             const match = pdfFile.match(/_(\d+)\.pdf$/);
 
-                            if (match) {
+                            if (match?.[1]) {
                                 // The -1 makes this 0-based
                                 const _pageIndex = parseInt(match[1], 10) - 1;
 
@@ -135,7 +135,7 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
         pdfFilePath: FilePath,
     ): Promise<PDFCpuInfo["infos"][number]["pageCount"]> {
         const pdfInfo = await this.pdfInfo(pdfFilePath);
-        return pdfInfo.infos[0].pageCount;
+        return pdfInfo.infos[0]!.pageCount;
     }
 
     async pages(

@@ -7,6 +7,7 @@
   "license": "MIT",
   "type": "module",
   "source": "./src/index.ts",
+  "types": "./lib/index.d.ts",
   "main": "./lib/pdf-split.cjs",
   "module": "./lib/pdf-split.module.js",
   "exports": {
@@ -14,7 +15,6 @@
     "require": "./lib/pdf-split.cjs",
     "default": "./lib/pdf-split.modern.js"
   },
-  "types": "./lib/index.d.ts",
   "scripts": {
     "build": "rm -rf ./lib/ && microbundle --target node --format modern,esm,cjs",
     "dev": "microbundle watch",
@@ -23,6 +23,7 @@
   "dependencies": {
     "@chriscdn/file-cache": "^0.0.14",
     "@chriscdn/memoize": "^1.0.10",
+    "@tsconfig/strictest": "^2.0.7",
     "path-exists": "^5.0.0"
   },
   "devDependencies": {
