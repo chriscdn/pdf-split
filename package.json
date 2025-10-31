@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@chriscdn/file-cache": "^0.0.14",
-    "@chriscdn/pdf-thumbnails": "^0.0.6",
     "path-exists": "^5.0.0"
   },
   "devDependencies": {
