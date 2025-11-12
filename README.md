@@ -21,7 +21,7 @@ yarn add @chriscdn/pdf-split
 Create a `PDFSplitFileCache` instance:
 
 ```ts
-import { PDFSplitFileCache } from "../src/index";
+import { PDFSplitFileCache, Rotate } from "@chriscdn/pdf-split";
 import { Duration } from "@chriscdn/duration";
 
 const splitCache = new PDFSplitFileCache({
@@ -48,12 +48,14 @@ Retrieve the file path to a PDF page:
 const firstPageFilePath = await splitCache.getFile({
   pdfFilePath: "/path/to/your/pdf/file.pdf",
   pageIndex: 0,
+  rotate: Rotate.DEG_0,
 });
 ```
 
 **Notes:**
 
 - `pageIndex` is 0-based.
+- `rotate` is optional, and can be set to `DEG_0` (default), `DEG_90`, `DEG_180`, or `DEG_270`
 - The cache key is based on `pdfFilePath` and `pageIndex`. Ensure that unique PDFs have unique names to avoid cache collisions.
 
 ## Other methods

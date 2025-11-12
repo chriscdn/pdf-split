@@ -22,14 +22,16 @@
   },
   "dependencies": {
     "@chriscdn/file-cache": "^0.0.14",
-    "@chriscdn/memoize": "^1.0.10",
+    "@chriscdn/memoize": "^1.0.11",
     "@tsconfig/strictest": "^2.0.7",
-    "path-exists": "^5.0.0"
+    "path-exists": "^5.0.0",
+    "sha1": "^1.1.1"
   },
   "devDependencies": {
+    "@types/sha1": "^1.1.5",
     "microbundle": "^0.15.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.5"
+    "vitest": "^4.0.8"
   },
   "files": [
     "lib"

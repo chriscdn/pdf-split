@@ -7,13 +7,22 @@ import { Semaphore } from "@chriscdn/promise-semaphore";
 import { pathExists } from "path-exists";
 import { PDFCpuInfo } from "./types";
 import { Memoize } from "@chriscdn/memoize";
+import sha1 from "sha1";
 
 const semaphore = new Semaphore();
 const execPromise = promisify(_exec);
 
+enum Rotate {
+    DEG_0 = 0,
+    DEG_90 = 90,
+    DEG_180 = 180,
+    DEG_270 = 270,
+}
+
 type PDFArgs = {
     pdfFilePath: FilePath;
     pageIndex: number; // 0-based
+    rotate?: Rotate;
 };
 
 export type PDFSplitFileCacheOptions =
@@ -34,10 +43,14 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
     private pdfcpu: FilePath;
 
     constructor(args: PDFSplitFileCacheOptions) {
-        super({
-            ...args,
-            ext: () => ".pdf",
-            cb: async (filePath, { pdfFilePath, pageIndex }) => {
+        // Make a standalone function that can be recursively called.
+        const cb = async (
+            filePath: FilePath,
+            { pdfFilePath, pageIndex, rotate }: PDFArgs,
+        ) => {
+            const rotateResolved = rotate ?? Rotate.DEG_0;
+
+            if (rotateResolved === Rotate.DEG_0) {
                 try {
                     // The semaphore prevents multiple consecutive calls (with
                     // different page numbers) from running the full extraction
@@ -80,7 +93,8 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
 
                             if (match?.[1]) {
                                 // The -1 makes this 0-based
-                                const _pageIndex = parseInt(match[1], 10) - 1;
+                                const _pageIndex = parseInt(match[1], 10) -
+                                    1;
 
                                 const sourceFilePath = path.join(
                                     _thumbnailPath,
@@ -93,12 +107,18 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                                         pageIndex: _pageIndex,
                                     });
 
-                                await fs.mkdir(path.dirname(targetFilePath), {
-                                    recursive: true,
-                                });
+                                await fs.mkdir(
+                                    path.dirname(targetFilePath),
+                                    {
+                                        recursive: true,
+                                    },
+                                );
 
                                 // these should always be on the same volume, making an fs.rename possible
-                                await fs.rename(sourceFilePath, targetFilePath);
+                                await fs.rename(
+                                    sourceFilePath,
+                                    targetFilePath,
+                                );
                             }
                         }));
 
@@ -107,14 +127,53 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                             // all good
                         } else {
                             throw new Error(
-                                `Invalid range or PDF: ${pageIndex}`,
+                                `Invalid range or PDF: ${filePath}`,
                             );
                         }
                     }
                 } finally {
                     semaphore.release(pdfFilePath);
                 }
+            } else {
+                const sourceFilePath = await this
+                    .resolveFilePath({
+                        pdfFilePath,
+                        pageIndex,
+                    });
+
+                await cb(sourceFilePath, {
+                    pdfFilePath,
+                    pageIndex,
+                    rotate: Rotate.DEG_0,
+                });
+
+                const command = [
+                    this.pdfcpu,
+                    "rotate",
+                    quote(sourceFilePath),
+                    rotateResolved,
+                    filePath,
+                ];
+
+                console.time("pdfcpu - rotate");
+                await execPromise(command.join(" "));
+                console.timeEnd("pdfcpu - rotate");
+            }
+        };
+
+        super({
+            ...args,
+            ext: () => ".pdf",
+            resolveCacheKey: ({ pdfFilePath, pageIndex, rotate }) => {
+                return sha1(
+                    JSON.stringify({
+                        pdfFilePath,
+                        pageIndex,
+                        rotate: rotate ?? Rotate.DEG_0,
+                    }),
+                );
             },
+            cb,
         });
 
         this.pdfcpu = args.pdfcpu ?? "pdfcpu";
@@ -152,4 +211,4 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
     }
 }
 
-export { PDFSplitFileCache };
+export { PDFSplitFileCache, Rotate };
