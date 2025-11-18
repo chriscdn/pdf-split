@@ -23,7 +23,7 @@
   "dependencies": {
     "@chriscdn/file-cache": "^0.0.14",
     "@chriscdn/memoize": "^1.0.11",
-    "@tsconfig/strictest": "^2.0.7",
+    "@tsconfig/strictest": "^2.0.8",
     "path-exists": "^5.0.0",
     "sha1": "^1.1.1"
   },
@@ -31,7 +31,7 @@
     "@types/sha1": "^1.1.5",
     "microbundle": "^0.15.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.10"
   },
   "files": [
     "lib"

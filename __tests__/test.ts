@@ -11,16 +11,17 @@ const splitCache = new PDFSplitFileCache({
 
 console.time("getFile");
 
-// const pages = await splitCache.pdfInfo(pdfFilePath);
-// console.log(pages);
-const zz = await splitCache.getFile({
-    pdfFilePath,
-    pageIndex: 1,
-    rotate: Rotate.DEG_90,
-});
+const pages = await splitCache.pdfInfo(pdfFilePath);
+console.log(JSON.stringify(pages));
 
-console.timeEnd("getFile");
+// const zz = await splitCache.getFile({
+//     pdfFilePath,
+//     pageIndex: 1,
+//     rotate: Rotate.DEG_90,
+// });
 
-console.log(zz);
+// console.timeEnd("getFile");
 
-splitCache.destroy();
+// console.log(zz);
+
+// splitCache.destroy();

@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import { FileCache, FileCacheOptions, FilePath } from "@chriscdn/file-cache";
 import { Semaphore } from "@chriscdn/promise-semaphore";
 import { pathExists } from "path-exists";
-import { PDFCpuInfo } from "./types";
+
 import { Memoize } from "@chriscdn/memoize";
 import sha1 from "sha1";
 
@@ -23,6 +23,24 @@ type PDFArgs = {
     pdfFilePath: FilePath;
     pageIndex: number; // 0-based
     rotate?: Rotate;
+};
+
+type PDFCpuPageInfo = {
+    source: string;
+    pageCount: number;
+    version: string;
+    title: string;
+    producer: string;
+    encrypted: boolean;
+    pageSizes: Array<{ width: number; height: number }>;
+};
+
+type PDFCpuInfo = {
+    header: {
+        version: string;
+        creation: string;
+    };
+    infos: PDFCpuPageInfo[];
 };
 
 export type PDFSplitFileCacheOptions =
@@ -180,21 +198,22 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
         this.pdfInfo = Memoize(this.pdfInfo.bind(this));
     }
 
-    async pdfInfo(pdfFilePath: FilePath): Promise<PDFCpuInfo> {
+    async pdfInfo(pdfFilePath: FilePath): Promise<PDFCpuPageInfo> {
         const command = [
             this.pdfcpu,
             "info -json",
             quote(pdfFilePath),
         ];
         const { stdout } = await execPromise(command.join(" "));
-        return JSON.parse(stdout) as PDFCpuInfo;
+        const pdfCpuInfo = JSON.parse(stdout) as PDFCpuInfo;
+        return pdfCpuInfo.infos[0]!;
     }
 
     async pageCount(
         pdfFilePath: FilePath,
-    ): Promise<PDFCpuInfo["infos"][number]["pageCount"]> {
+    ): Promise<PDFCpuPageInfo["pageCount"]> {
         const pdfInfo = await this.pdfInfo(pdfFilePath);
-        return pdfInfo.infos[0]!.pageCount;
+        return pdfInfo.pageCount;
     }
 
     async pages(
