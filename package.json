@@ -25,13 +25,15 @@
     "@chriscdn/memoize": "^1.0.11",
     "@tsconfig/strictest": "^2.0.8",
     "path-exists": "^5.0.0",
-    "sha1": "^1.1.1"
+    "sha1": "^1.1.1",
+    "shell-quote": "^1.8.3"
   },
   "devDependencies": {
     "@types/sha1": "^1.1.5",
+    "@types/shell-quote": "^1.7.5",
     "microbundle": "^0.15.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.10"
+    "vitest": "^4.0.15"
   },
   "files": [
     "lib"

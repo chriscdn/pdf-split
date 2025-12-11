@@ -1,7 +1,10 @@
-import { PDFSplitFileCache, Rotate } from "../src/index";
+import { PDFSplitFileCache } from "../src/index";
 
 const pdfFilePath =
-    "/Users/chris/Development/github/pdf-split/__tests__/pdfs/lorem.pdf";
+    "/Users/chris/Development/github/pdf-split/__tests__/pdfs/10 lorem big - password.pdf";
+
+// const pdfFilePath =
+//     "/Users/chris/Development/github/pdf-split/__tests__/pdfs/lorem.pdf";
 
 const splitCache = new PDFSplitFileCache({
     cachePath: "/Users/chris/Development/github/pdf-split/__tests__/temp",
@@ -11,7 +14,8 @@ const splitCache = new PDFSplitFileCache({
 
 console.time("getFile");
 
-const pages = await splitCache.pdfInfo(pdfFilePath);
+const pages = await splitCache.isPasswordProtected(pdfFilePath);
+
 console.log(JSON.stringify(pages));
 
 // const zz = await splitCache.getFile({
@@ -24,4 +28,4 @@ console.log(JSON.stringify(pages));
 
 // console.log(zz);
 
-// splitCache.destroy();
+splitCache.destroy();

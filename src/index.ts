@@ -5,43 +5,27 @@ import fs from "fs/promises";
 import { FileCache, FileCacheOptions, FilePath } from "@chriscdn/file-cache";
 import { Semaphore } from "@chriscdn/promise-semaphore";
 import { pathExists } from "path-exists";
-
 import { Memoize } from "@chriscdn/memoize";
 import sha1 from "sha1";
+import { quote as shellQuote } from "shell-quote";
+import { isPasswordRequiredException } from "./exceptions";
+import {
+    type Options,
+    type PDFArgs,
+    type PDFCpuInfo,
+    type PDFCpuPageInfo,
+    Rotate,
+} from "./types";
 
 const semaphore = new Semaphore();
 const execPromise = promisify(_exec);
 
-enum Rotate {
-    DEG_0 = 0,
-    DEG_90 = 90,
-    DEG_180 = 180,
-    DEG_270 = 270,
-}
-
-type PDFArgs = {
-    pdfFilePath: FilePath;
-    pageIndex: number; // 0-based
-    rotate?: Rotate;
-};
-
-type PDFCpuPageInfo = {
-    source: string;
-    pageCount: number;
-    version: string;
-    title: string;
-    producer: string;
-    encrypted: boolean;
-    pageSizes: Array<{ width: number; height: number }>;
-};
-
-type PDFCpuInfo = {
-    header: {
-        version: string;
-        creation: string;
-    };
-    infos: PDFCpuPageInfo[];
-};
+const optionsToCLI = (
+    options: Options,
+) => [
+    ...(options.userPassword ? ["-upw", quote(options.userPassword)] : []),
+    ...(options.ownerPassword ? ["-opw", quote(options.ownerPassword)] : []),
+];
 
 export type PDFSplitFileCacheOptions =
     & Omit<
@@ -55,7 +39,7 @@ export type PDFSplitFileCacheOptions =
 const randomDirectoryName = (l = 16) =>
     [...Array(l)].map(() => Math.random().toString(36)[2]).join("");
 
-const quote = (text: string) => `"${text}"`;
+const quote = (text: string) => shellQuote([text]);
 
 class PDFSplitFileCache extends FileCache<PDFArgs> {
     private pdfcpu: FilePath;
@@ -100,9 +84,7 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                             quote(_thumbnailPath),
                         ];
 
-                        console.time("pdfcpu - split");
                         await execPromise(command.join(" "));
-                        console.timeEnd("pdfcpu - split");
 
                         const pdfFiles = await fs.readdir(_thumbnailPath);
 
@@ -132,7 +114,7 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                                     },
                                 );
 
-                                // these should always be on the same volume, making an fs.rename possible
+                                // same volume, making an fs.rename possible
                                 await fs.rename(
                                     sourceFilePath,
                                     targetFilePath,
@@ -170,27 +152,24 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
                     "rotate",
                     quote(sourceFilePath),
                     rotateResolved,
-                    filePath,
+                    quote(filePath),
                 ];
 
-                console.time("pdfcpu - rotate");
                 await execPromise(command.join(" "));
-                console.timeEnd("pdfcpu - rotate");
             }
         };
 
         super({
             ...args,
             ext: () => ".pdf",
-            resolveCacheKey: ({ pdfFilePath, pageIndex, rotate }) => {
-                return sha1(
+            resolveCacheKey: ({ pdfFilePath, pageIndex, rotate }) =>
+                sha1(
                     JSON.stringify({
                         pdfFilePath,
                         pageIndex,
                         rotate: rotate ?? Rotate.DEG_0,
                     }),
-                );
-            },
+                ),
             cb,
         });
 
@@ -198,22 +177,44 @@ class PDFSplitFileCache extends FileCache<PDFArgs> {
         this.pdfInfo = Memoize(this.pdfInfo.bind(this));
     }
 
-    async pdfInfo(pdfFilePath: FilePath): Promise<PDFCpuPageInfo> {
+    async pdfInfo(
+        pdfFilePath: FilePath,
+        options: Options = {},
+    ): Promise<PDFCpuPageInfo> {
         const command = [
             this.pdfcpu,
             "info -json",
+            ...optionsToCLI(options),
             quote(pdfFilePath),
         ];
+
+        // console.log("**************");
+        // console.log(command);
+        // console.log("**************");
+
         const { stdout } = await execPromise(command.join(" "));
         const pdfCpuInfo = JSON.parse(stdout) as PDFCpuInfo;
         return pdfCpuInfo.infos[0]!;
     }
 
+    async isPasswordProtected(pdfFilePath: FilePath) {
+        try {
+            await this.pdfInfo(pdfFilePath);
+            return false;
+        } catch (e) {
+            if (isPasswordRequiredException(e)) {
+                return true;
+            } else {
+                throw e;
+            }
+        }
+    }
+
     async pageCount(
         pdfFilePath: FilePath,
     ): Promise<PDFCpuPageInfo["pageCount"]> {
-        const pdfInfo = await this.pdfInfo(pdfFilePath);
-        return pdfInfo.pageCount;
+        const { pageCount } = await this.pdfInfo(pdfFilePath);
+        return pageCount;
     }
 
     async pages(
