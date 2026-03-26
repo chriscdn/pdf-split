@@ -14,7 +14,9 @@ const splitCache = new PDFSplitFileCache({
 
 console.time("getFile");
 
-const pages = await splitCache.isPasswordProtected(pdfFilePath);
+const pages = await splitCache.pdfInfo(pdfFilePath, {
+    userPassword: "password",
+});
 
 console.log(JSON.stringify(pages));
 
