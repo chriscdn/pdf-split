@@ -1,6 +1,10 @@
 {
   "extends": "@tsconfig/strictest/tsconfig.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true
-  }
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "exactOptionalPropertyTypes": false
+  },
+  "include": ["src"]
 }

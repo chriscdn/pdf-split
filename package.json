@@ -6,23 +6,18 @@
   "author": "Christopher Meyer <chris@schwiiz.org>",
   "license": "MIT",
   "type": "module",
-  "source": "./src/index.ts",
+  "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
-  "main": "./lib/pdf-split.cjs",
-  "module": "./lib/pdf-split.module.js",
-  "exports": {
-    "types": "./lib/index.d.ts",
-    "require": "./lib/pdf-split.cjs",
-    "default": "./lib/pdf-split.modern.js"
-  },
+  "exports": "./lib/index.js",
   "scripts": {
-    "build": "rm -rf ./lib/ && microbundle --target node --format modern,esm,cjs",
-    "dev": "microbundle watch",
+    "build": "tsup",
+    "watch": "yarn build --watch",
     "test": "vitest"
   },
   "dependencies": {
     "@chriscdn/file-cache": "^0.0.14",
     "@chriscdn/memoize": "^1.0.11",
+    "@chriscdn/promise-semaphore": "^4.0.0",
     "@tsconfig/strictest": "^2.0.8",
     "path-exists": "^5.0.0",
     "sha1": "^1.1.1",
@@ -31,7 +26,7 @@
   "devDependencies": {
     "@types/sha1": "^1.1.5",
     "@types/shell-quote": "^1.7.5",
-    "microbundle": "^0.15.1",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
   },
