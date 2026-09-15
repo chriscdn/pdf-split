@@ -6,29 +6,35 @@
   "author": "Christopher Meyer <chris@schwiiz.org>",
   "license": "MIT",
   "type": "module",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "exports": "./lib/index.js",
+  "types": "./lib/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.mts",
+      "import": "./lib/index.mjs"
+    }
+  },
   "scripts": {
-    "build": "tsup",
-    "watch": "yarn build --watch",
+    "build": "tsdown",
+    "watch": "pnpm build --watch",
     "test": "vitest"
   },
   "dependencies": {
-    "@chriscdn/file-cache": "^0.0.14",
-    "@chriscdn/memoize": "^1.0.11",
-    "@chriscdn/promise-semaphore": "^4.0.0",
+    "@chriscdn/file-cache": "^2.0.1",
+    "@chriscdn/memoize": "^3.0.1",
+    "@chriscdn/promise-semaphore": "^4.0.1",
+    "@chriscdn/random": "^1.0.4",
+    "@chriscdn/to-number": "^2.1.2",
     "@tsconfig/strictest": "^2.0.8",
     "path-exists": "^5.0.0",
     "sha1": "^1.1.1",
-    "shell-quote": "^1.8.3"
+    "shell-quote": "^1.10.0"
   },
   "devDependencies": {
     "@types/sha1": "^1.1.5",
     "@types/shell-quote": "^1.7.5",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.15"
+    "tsdown": "0.23.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
   },
   "files": [
     "lib"
