@@ -1,27 +1,29 @@
+import { fileURLToPath } from "url";
 import { PDFSplitFileCache, Rotate } from "../src";
+import path from "path";
 
-// const pdfFilePath =
-//   "/Users/chris/Development/github/pdf-split/__tests__/pdfs/10 lorem big - password.pdf";
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename);
 
-const pdfFilePath =
-  "/Users/chris/Development/github/pdf-split/__tests__/pdfs/lorem.pdf";
+const cachePath = path.resolve(__dirname, "temp");
+const inFile = path.resolve(__dirname, "./pdfs/lorem.pdf");
+
+// const bin1 = "pdfcpu";
+// const bin2 =
+//   "/Users/chris/Development/github/pdf-split/__tests__/bin/pdfcpu0111";
+// const bin3 =
+//   "/Users/chris/Development/github/pdf-split/__tests__/bin/pdfcpu0121";
 
 const splitCache = new PDFSplitFileCache({
-  cachePath: "/Users/chris/Development/github/pdf-split/__tests__/temp",
-  ttl: 3.6e6,
+  // pdfcpu: bin3,
+  cachePath,
+  ttl: 10_000,
   autoCreateCachePath: true,
+  cleanupInterval: 5_000,
 });
-
-console.time("getFile");
-
-const pages = await splitCache.pdfInfo(pdfFilePath, {
-  // userPassword: "password",
-});
-
-console.log(JSON.stringify(pages));
 
 const zz = await splitCache.getFile({
-  pdfFilePath,
+  pdfFilePath: inFile,
   pageIndex: 1,
   rotate: Rotate.DEG_90,
 });
@@ -30,4 +32,15 @@ const zz = await splitCache.getFile({
 
 // console.log(zz);
 
-splitCache.destroy();
+// splitCache.destroy();
+
+// const pdfCpu = new PdfCpu();
+
+// const outDir = path.resolve(__dirname, "./temp/_temp/zzz");
+
+// await fs.mkdir(outDir, { recursive: true });
+
+// pdfCpu.split({
+//   inFile,
+//   outDir,
+// });

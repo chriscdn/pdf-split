@@ -5,15 +5,18 @@ enum Rotate {
   DEG_90 = 90,
   DEG_180 = 180,
   DEG_270 = 270,
+  DEG_MINUS_90 = -90,
+  DEG_MINUS_180 = -180,
+  DEG_MINUS_270 = -270,
 }
 
-type PDFArgs = {
+type PDFSplitArgs = {
   pdfFilePath: FilePath;
   pageIndex: number; // 0-based
   rotate?: Rotate;
 };
 
-type PDFCpuPageInfo = {
+type PDFCpuPageItem = {
   source: FilePath;
   pageCount: number;
   version: string;
@@ -21,25 +24,29 @@ type PDFCpuPageInfo = {
   producer: string;
   encrypted: boolean;
   pageSizes: Array<{ width: number; height: number }>;
+  createor: string;
+  creationDate: Date;
+  modificationDate: Date;
+  unit: Unit;
 };
 
-type PDFCpuInfo = {
-  header: {
-    version: string;
-    creation: string;
-  };
-  infos: PDFCpuPageInfo[];
-};
+// type PDFCpuInfo = {
+//   header: {
+//     version: string;
+//     creation: string;
+//   };
+//   infos: PDFCpuPageItem[];
+// };
 
-type Options = {
+type PasswordOptions = {
   userPassword?: string;
   ownerPassword?: string;
 };
 
-export {
-  type Options,
-  type PDFArgs,
-  type PDFCpuInfo,
-  type PDFCpuPageInfo,
-  Rotate,
+type Unit = "po" | "in" | "cm" | "mm";
+
+type InfoOptions = PasswordOptions & {
+  unit?: Unit;
 };
+
+export { type InfoOptions, type PDFSplitArgs, type PDFCpuPageItem, Rotate };

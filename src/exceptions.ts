@@ -1,10 +1,30 @@
 import { type ExecException } from "child_process";
 
-const isExecException = (e: any): e is ExecException =>
-  e && typeof e === "object" && "stdout" in e && "stderr" in e;
+const isExecException = (error: unknown): error is ExecException => {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    ("cmd" in error || "killed" in error || "signal" in error)
+  );
+};
 
-const isPasswordRequiredException = (e: any) =>
-  isExecException(e) &&
-  e.stderr?.trim() === "pdfcpu: please provide the correct password";
+class PasswordError extends Error {}
 
-export { isPasswordRequiredException };
+/**
+ *
+ *
+ * @param e
+ * @returns
+ */
+const isPasswordRequiredException = (e: unknown) => {
+  if (isExecException(e)) {
+    return String(e.stderr)
+      .trim()
+      .includes("please provide the correct password");
+  } else {
+    return false;
+  }
+};
+
+export { isPasswordRequiredException, PasswordError };

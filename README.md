@@ -10,12 +10,6 @@ Using npm:
 npm install @chriscdn/pdf-split
 ```
 
-Using yarn:
-
-```bash
-yarn add @chriscdn/pdf-split
-```
-
 ## Usage
 
 Create a `PDFSplitFileCache` instance:
