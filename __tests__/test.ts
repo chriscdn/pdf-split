@@ -8,12 +8,6 @@ const __dirname = path.dirname(__filename);
 const cachePath = path.resolve(__dirname, "temp");
 const inFile = path.resolve(__dirname, "./pdfs/lorem.pdf");
 
-// const bin1 = "pdfcpu";
-// const bin2 =
-//   "/Users/chris/Development/github/pdf-split/__tests__/bin/pdfcpu0111";
-// const bin3 =
-//   "/Users/chris/Development/github/pdf-split/__tests__/bin/pdfcpu0121";
-
 const splitCache = new PDFSplitFileCache({
   // pdfcpu: bin3,
   cachePath,
